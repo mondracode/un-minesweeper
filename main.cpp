@@ -18,6 +18,9 @@ int h2=98;
 
 };
 
+struct point{
+int x; int y;
+};
 //enum color {
 //  my_black = 1,
 //  my_white, my_white_bg,
@@ -64,16 +67,50 @@ void square (int y1, int x1, int y2, int x2){
     mvaddch(y2-1, x2, ACS_LRCORNER);
 }
 
+void print_cursor(int y, int x){
+        point cursor;
+        cursor.x=x;
+        cursor.y=y;
+        mvaddch(cursor.y, cursor.x, ACS_BLOCK);
+        mvaddch(cursor.y, cursor.x+1, ACS_BLOCK);
+        mvaddch(cursor.y+1, cursor.x, ACS_BLOCK);
+        mvaddch(cursor.y+1, cursor.x+1, ACS_BLOCK);
+       // mvaddch(cursor.y+1, cursor.x+2, ACS_BLOCK);
+       // mvaddch(cursor.y, cursor.x+2, ACS_BLOCK);
+}
+
 void game(){
+
+
     clear();
-    coor gwindow;
 
-    int cells[gwindow.w2*gwindow.h2];
+   // int cells[gwindow.w2*gwindow.h2];
 
-    square(0,0,36,99);
+    square(4,0,36,99);
 
+    point current_pos;
+
+    print_cursor(5,1);
+
+    current_pos.y = 1;
+    current_pos.x = 5;
+
+   // print_cursor(current_pos.y+2,1);
+
+    int c = getchar();
+
+
+   /*while(true){
+    switch (c) {
+        case KEY_UP:    print_cursor(current_pos.y+2, current_pos.x); break;
+        case KEY_DOWN:  print_cursor(current_pos.y-2, current_pos.x); break;
+        case KEY_RIGHT: print_cursor(current_pos.y, current_pos.x+2); break;
+        case KEY_LEFT:  print_cursor(current_pos.y, current_pos.x-2); break;
+    }
+   }*/
 
 }
+
 
 void intro(){
     square(0, 0, 36, 99);
