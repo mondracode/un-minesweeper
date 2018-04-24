@@ -20,3 +20,14 @@
 	<stdio.h>
 	<wchar.h>
 
+1524531282 source:c:\users\end user\documents\mis archivos\universidad y eso\programación\unminesweeper\main.cpp
+	<curses.h>
+	<iostream>
+
+1521755626 c:\users\end user\documents\mis archivos\universidad y eso\programación\unminesweeper\lib\pdcurses-master\curses.h
+	<stdarg.h>
+	<stdint.h>
+	<stddef.h>
+	<stdio.h>
+	<wchar.h>
+

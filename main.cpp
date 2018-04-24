@@ -9,8 +9,38 @@
  i686-w64-mingw32-g++ -Iwin/PDCurses -Wall -Werror -static -lpthread -o snake.exe snake.cc pdcurses.a
 */
 
+struct coor {
 
-void cuadrado (int y1, int x1, int y2, int x2){
+int w1=1;
+int w2=35;
+int h1=1;
+int h2=98;
+
+};
+
+//enum color {
+//  my_black = 1,
+//  my_white, my_white_bg,
+//  my_green, my_green_bg,
+//  my_yellow_bg,
+//  my_blue_bg
+//};
+
+// Takes 3 numbers between 0 and 5 (inclusive) and returns the number a number
+// that can be inputed into init_pair.
+// R is for Red
+// G is for Green
+// B is for Blue
+// There are in total 6*6*6 different possible colors
+short color_from_RGB(char r, char g, char b) {
+    return (r*36 + g*6 + b*1) + 16;
+}
+
+short grey_from_24(char g) {
+    return 216 + g + 16;
+}
+
+void square (int y1, int x1, int y2, int x2){
 
     mvaddch(y1, x1, ACS_ULCORNER);
 
@@ -34,18 +64,21 @@ void cuadrado (int y1, int x1, int y2, int x2){
     mvaddch(y2-1, x2, ACS_LRCORNER);
 }
 
-void juego(){
+void game(){
     clear();
-    cuadrado(0,0,36,99);
+    coor gwindow;
+
+    int cells[gwindow.w2*gwindow.h2];
+
+    square(0,0,36,99);
+
 
 }
 
 void intro(){
-    cuadrado(0, 0, 36, 99);
-
-
-    beep();
-
+    square(0, 0, 36, 99);
+    //los pairs van en (# DEL PAR, COLOR DE TEXTO, COLOR DE FONDO
+    init_pair(1, COLOR_BLUE, COLOR_WHITE);
     //estos son los ojos
     mvaddch(10, 34, ACS_BLOCK);
     mvaddch(10, 35, ACS_BLOCK);
@@ -88,14 +121,12 @@ void intro(){
       i = getch();
 
         if(i==' '){
-          juego();
+          game();
         }
 
     }
 
 }
-
-
 
 int main()
 {
@@ -114,6 +145,16 @@ int main()
 
   clear();     // cleaning screen
   nodelay(stdscr, false); // deactivating blocking getch
+
+  // Setting color pairs
+/*  short black = grey_from_24(0);
+  init_pair(my_black,     black,                 black                );
+  init_pair(my_white,     grey_from_24(23),      black                );
+  init_pair(my_white_bg , black,                 grey_from_24(21)     );
+  init_pair(my_green,     color_from_RGB(2,3,1), black                );
+  init_pair(my_green_bg , black,                 color_from_RGB(2,3,1));
+  init_pair(my_yellow_bg, black,                 color_from_RGB(5,4,1));
+  init_pair(my_blue_bg,   black,                 color_from_RGB(1,1,5));*/
 
   //para agregar caracteres en pantalla se insertan de la forma y,x
 
