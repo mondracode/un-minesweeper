@@ -42,3 +42,14 @@
 	<stdio.h>
 	<wchar.h>
 
+1524679418 source:c:\users\smggu\desktop\unminesweeper\main.cpp
+	<curses.h>
+	<iostream>
+
+1524626015 c:\users\smggu\desktop\unminesweeper\lib\pdcurses-master\curses.h
+	<stdarg.h>
+	<stdint.h>
+	<stddef.h>
+	<stdio.h>
+	<wchar.h>
+
