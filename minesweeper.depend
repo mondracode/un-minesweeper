@@ -1,48 +1,5 @@
 # depslib dependency file v1.0
-1522199399 source:c:\users\name\desktop\snake\snake\main.cpp
-	<curses.h>
-
-1521766426 c:\users\name\desktop\snake\snake\lib\pdcurses-master\curses.h
-	<stdarg.h>
-	<stdint.h>
-	<stddef.h>
-	<stdio.h>
-	<wchar.h>
-
-1523573786 source:c:\users\end user\desktop\proyecto c++\minesweeper\main.cpp
-	<curses.h>
-	<iostream>
-
-1521755626 c:\users\end user\desktop\proyecto c++\minesweeper\lib\pdcurses-master\curses.h
-	<stdarg.h>
-	<stdint.h>
-	<stddef.h>
-	<stdio.h>
-	<wchar.h>
-
-1524605155 source:c:\users\end user\documents\mis archivos\universidad y eso\programación\unminesweeper\main.cpp
-	<curses.h>
-	<iostream>
-
-1524602726 c:\users\end user\documents\mis archivos\universidad y eso\programación\unminesweeper\lib\pdcurses-master\curses.h
-	<stdarg.h>
-	<stdint.h>
-	<stddef.h>
-	<stdio.h>
-	<wchar.h>
-
-1524603284 source:c:\users\end user\documents\mis archivos\universidad y eso\programación\unminesweeper\unminesweeper\main.cpp
-	<curses.h>
-	<iostream>
-
-1524602726 c:\users\end user\documents\mis archivos\universidad y eso\programación\unminesweeper\unminesweeper\lib\pdcurses-master\curses.h
-	<stdarg.h>
-	<stdint.h>
-	<stddef.h>
-	<stdio.h>
-	<wchar.h>
-
-1524679418 source:c:\users\smggu\desktop\unminesweeper\main.cpp
+1525111197 source:c:\users\smggu\desktop\unminesweeper\main.cpp
 	<curses.h>
 	<iostream>
 

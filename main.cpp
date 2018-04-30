@@ -53,6 +53,23 @@ short grey_from_24(char g) {
     return 216 + g + 16;
 }
 
+void gcolors(){
+
+// Setting color pairs
+//los pairs van en (# DEL PAR, COLOR DE TEXTO, COLOR DE FONDO)
+  short black = grey_from_24(0);
+  init_pair(my_black,     black,                 black                );
+  init_pair(my_white,     grey_from_24(23),      black                );
+  init_pair(my_white_bg , black,                 grey_from_24(21)     );
+  init_pair(my_green,     color_from_RGB(2,3,1), black                );
+  init_pair(my_green_bg , black,                 color_from_RGB(2,3,1));
+  init_pair(my_yellow_bg, black,                 color_from_RGB(5,4,1));
+  init_pair(my_blue_bg,   black,                 color_from_RGB(1,1,5));
+  init_pair(my_red_bg,   COLOR_BLUE,                 color_from_RGB(5,1,0));
+  init_pair(original, COLOR_WHITE, COLOR_BLACK);
+  init_pair(my_blue, COLOR_BLUE, COLOR_WHITE);
+
+}
 void square (int y1, int x1, int y2, int x2){
 
     mvaddch(y1, x1, ACS_DS_ULCORNER);
@@ -77,6 +94,16 @@ void square (int y1, int x1, int y2, int x2){
     mvaddch(y2-1, x2, ACS_DS_LRCORNER);
 }
 
+void print_cells(){
+    //el ancho es 34*24
+   for(int j=5; j<29; j++){
+           for(int i=6;  i<74; i+=2){
+                mvaddch(j, i, '.');
+            }
+    }
+
+}
+
 void print_cursor(point p){
         mvaddch(p.y, p.x, ACS_BLOCK);
         mvaddch(p.y, p.x+1, ACS_BLOCK);
@@ -88,37 +115,48 @@ void game(){
 
     cell gscreen[33][23];
     //color_set(4, NULL);
-    for(int y=0; y<33; y++){
-        for (int h=0; h<23;h++){
-            gscreen[h][y].mine=false;
-            if ((gscreen[h][y].mine)=false){
-                color_set(1, NULL);
-            }
+
+
+    for(int i=0; i<23; i++){
+        for(int j=0; j<33; j++){
+            gscreen[i][j].mine=0;
         }
     }
+
 
     square(4,5,30,74);
 
     //el ancho es 33*23
     point player;
-        player.y = 5;
+        player.y =  5;
         player.x = 6;
+
+    print_cells();
 
     print_cursor(player);
 
     bool quit = false;
     while( !quit ) {
     int f = getch();
-    napms(10);
+
+    point oldpos;
+        oldpos.y=player.y;
+        oldpos.x=player.x;
+
     switch(f) {
-      case KEY_LEFT:  player.x-=2; break;
-      case KEY_RIGHT: player.x+=2; break;
-      case KEY_UP:    player.y--;  break;
-      case KEY_DOWN:  player.y++;  break;
-      case 'k':    gscreen[player.x+33][player.y+23].click=true;
-                   color_set(my_red_bg, NULL);      break;
+      case KEY_LEFT:        player.x-=2;    break;
+      case KEY_RIGHT:     player.x+=2;   break;
+      case KEY_UP:           player.y--;       break;
+      case KEY_DOWN:    player.y++;     break;
+      case 10: gscreen[(player.x-6)/2][player.y+5].click=true; break;
+
+      //case KEY_ENTER:     gscreen[player.x+33][player.y+23].click=true;
+      //case 'k':    gscreen[player.x+33][player.y+23].click=true;
+      //             color_set(my_red_bg, NULL);      break;
+
       case 'q': quit = true; break;
     }
+
     //napms(50);
     if(player.x<=4){
         player.x=72;
@@ -133,12 +171,14 @@ void game(){
         player.y=28;
     }
 
-    if(gscreen[player.x][player.y].mine==true){
-        color_set(my_red_bg, NULL);
-    }
     clear();
     color_set(my_blue, NULL);
     square(4,5,30,74);
+    print_cells();
+    if(gscreen[(player.x-6)/2][player.y+5].click==true){
+
+        color_set(my_red_bg, NULL);
+    }
     print_cursor(player);
 
 }
@@ -146,7 +186,7 @@ void game(){
 }
 void intro(){
     square(4,5,30,74);
-    //los pairs van en (# DEL PAR, COLOR DE TEXTO, COLOR DE FONDO
+    //los pairs van en (# DEL PAR, COLOR DE TEXTO, COLOR DE FONDO)
     bkgd(COLOR_PAIR(my_blue));
     //estos son los ojos
     color_set(my_blue, nullptr);
@@ -208,36 +248,21 @@ int main()
   // Initializing window to print in
   initscr();   // starting screen
   cbreak();
-  noecho();    // consume characters without showing them in screen
-  curs_set(0); // setting cursor as invisible
-  keypad(stdscr, true); // allowing ncurses to convert press keys into curses representation (useful for KEY_UP)
-  start_color(); // asking ncurses to use colors
+  noecho();                                                            // consume characters without showing them in screen
+  curs_set(0);                                                         // setting cursor as invisible
+  keypad(stdscr, true);                                         // allowing ncurses to convert press keys into curses representation (useful for KEY_UP)
+  start_color();                                                      // asking ncurses to use colors
+  clear();                                                               // cleaning screen
+  nodelay(stdscr, false);                                      // deactivating blocking getch
+  gcolors();                                                          // starting color pairs
 
-  clear();     // cleaning screen
-  nodelay(stdscr, false); // deactivating blocking getch
+  //para agregar caracteres en pantalla se insertan de la forma (y,x)
 
-  // Setting color pairs
-  short black = grey_from_24(0);
-  init_pair(my_black,     black,                 black                );
-  init_pair(my_white,     grey_from_24(23),      black                );
-  init_pair(my_white_bg , black,                 grey_from_24(21)     );
-  init_pair(my_green,     color_from_RGB(2,3,1), black                );
-  init_pair(my_green_bg , black,                 color_from_RGB(2,3,1));
-  init_pair(my_yellow_bg, black,                 color_from_RGB(5,4,1));
-  init_pair(my_blue_bg,   black,                 color_from_RGB(1,1,5));
-  init_pair(my_red_bg,   COLOR_WHITE,                 color_from_RGB(5,1,0));
-  init_pair(original, COLOR_WHITE, COLOR_BLACK);
-  init_pair(my_blue, COLOR_BLUE, COLOR_WHITE);
-
-  //para agregar caracteres en pantalla se insertan de la forma y,x
-
-
-
-// ______________Acá comienza mi código en main_____________________
+  // ______________Acá comienza mi código en main_____________________
 
     intro();
 
 //endwin(); // closing window
-
+  getch();
   return 0;
 }
