@@ -36,7 +36,7 @@ enum color {
   my_green, my_green_bg,
   my_yellow_bg,
   my_blue_bg, my_red_bg, original,
-  my_blue
+  my_blue, clicked
 };
 
 // Takes 3 numbers between 0 and 5 (inclusive) and returns the number a number
@@ -68,6 +68,7 @@ void gcolors(){
   init_pair(my_red_bg,   COLOR_BLUE,                 color_from_RGB(5,1,0));
   init_pair(original, COLOR_WHITE, COLOR_BLACK);
   init_pair(my_blue, COLOR_BLUE, COLOR_WHITE);
+  init_pair(clicked, COLOR_BLUE, grey_from_24(12));
 
 }
 void square (int y1, int x1, int y2, int x2){
@@ -94,15 +95,17 @@ void square (int y1, int x1, int y2, int x2){
     mvaddch(y2-1, x2, ACS_DS_LRCORNER);
 }
 
-void print_cells(){
+//void print_cells(){
     //el ancho es 34*24
-   for(int j=5; j<29; j++){
-           for(int i=6;  i<74; i+=2){
-                mvaddch(j, i, '.');
-            }
-    }
+    //crea las celdas
+//   for(int j=5; j<29; j++){
+//           for(int i=6;  i<74; i+=2){
 
-}
+//                mvaddch(j, i, '.');
+
+//            }
+//    }
+//}
 
 void print_cursor(point p){
         mvaddch(p.y, p.x, ACS_BLOCK);
@@ -113,27 +116,39 @@ void game(){
     //ACS_LANTERN PARA LAS MINAS
     clear();
 
-    cell gscreen[33][23];
-    //color_set(4, NULL);
+    cell gscreen[34][24];
+
+        //color_set(4, NULL);
 
 
-    for(int i=0; i<23; i++){
-        for(int j=0; j<33; j++){
-            gscreen[i][j].mine=0;
+
+for(int i=0; i<24; i++){
+    for(int j=0; j<34; j++){
+        gscreen[j][i].click=0;
+        gscreen[j][i].flag=0;
+
+        if(gscreen[j][i].click==0){
+            mvaddch(i+5, (j+3)*2, '.');
+        }
+        else if(gscreen[j][i].click==1){
+            mvaddch(i+5, (j+3)*2, '#');
         }
     }
+}
+
+    color_set(my_blue, NULL);
 
 
     square(4,5,30,74);
 
-    //el ancho es 33*23
+    //el ancho es 34*24
     point player;
         player.y =  5;
         player.x = 6;
 
-    print_cells();
+//    print_cells();
 
-    print_cursor(player);
+   print_cursor(player);
 
     bool quit = false;
     while( !quit ) {
@@ -148,11 +163,9 @@ void game(){
       case KEY_RIGHT:     player.x+=2;   break;
       case KEY_UP:           player.y--;       break;
       case KEY_DOWN:    player.y++;     break;
-      case 10: gscreen[(player.x-6)/2][player.y+5].click=true; break;
+      case 10: gscreen[(player.x-3)/2][player.y-5].click=true; break;
+      case '-': gscreen[(player.x-3)/2][player.y-5].flag=true; break;
 
-      //case KEY_ENTER:     gscreen[player.x+33][player.y+23].click=true;
-      //case 'k':    gscreen[player.x+33][player.y+23].click=true;
-      //             color_set(my_red_bg, NULL);      break;
 
       case 'q': quit = true; break;
     }
@@ -174,16 +187,39 @@ void game(){
     clear();
     color_set(my_blue, NULL);
     square(4,5,30,74);
-    print_cells();
-    if(gscreen[(player.x-6)/2][player.y+5].click==true){
 
-        color_set(my_red_bg, NULL);
+//   print_cells();
+//EL LIENZO MIDE 68(34)*24
+
+for(int i=0; i<24; i++){
+    for(int j=0; j<34; j++){
+
+        if(gscreen[j][i].click==0){
+            mvaddch(i+5, (j+3)*2, '.');
+        }
+        else if(gscreen[j][i].click==1){
+
+            if(gscreen[j][i].flag==1){
+                gscreen[j][i].click==0;
+            }
+            color_set(clicked, nullptr);
+            mvaddch(i+5, (j+2)*2, '#');
+            mvaddch(i+5, (j+2.5)*2, ' ');
+            color_set(my_blue, nullptr);
+            mvaddch(i+5, (j+3)*2, '.');
+        }
+        if(gscreen[j][i].flag==1){
+            color_set(my_green, NULL);
+             mvaddch(i+5, (j+2)*2, '|');
+             mvaddch(i+5, (j+2.5)*2, '>');
+             color_set(my_blue, nullptr);
+        }
     }
+}
     print_cursor(player);
-
+}
 }
 
-}
 void intro(){
     square(4,5,30,74);
     //los pairs van en (# DEL PAR, COLOR DE TEXTO, COLOR DE FONDO)
