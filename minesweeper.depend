@@ -10,3 +10,33 @@
 	<stdio.h>
 	<wchar.h>
 
+1525458295 source:c:\users\end user\documents\mis archivos\universidad y eso\programación\unminesweeper\main.cpp
+	<curses.h>
+	"lib/randutils.hh"
+	<iostream>
+
+1525127931 c:\users\end user\documents\mis archivos\universidad y eso\programación\unminesweeper\lib\pdcurses-master\curses.h
+	<stdarg.h>
+	<stdint.h>
+	<stddef.h>
+	<stdio.h>
+	<wchar.h>
+
+1525367681 c:\users\end user\documents\mis archivos\universidad y eso\programación\unminesweeper\lib\randutils.hh
+	<cstddef>
+	<cstdint>
+	<cstdlib>
+	<random>
+	<array>
+	<functional>
+	<initializer_list>
+	<utility>
+	<type_traits>
+	<iterator>
+	<chrono>
+	<thread>
+	<algorithm>
+	<immintrin.h>
+	<process.h>
+	<unistd.h>
+

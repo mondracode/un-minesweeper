@@ -1,4 +1,5 @@
 #include <curses.h>
+#include "lib/randutils.hh"
 #include <iostream>
 
 /*
@@ -32,20 +33,21 @@ struct cell {
 
 enum color {
   my_black = 1,
-  my_white, my_white_bg,
+  my_white, gblack, my_white_bg,
   my_green, my_green_bg,
   my_yellow_bg,
   my_blue_bg, my_red_bg, original,
-  my_blue, clicked
+  my_blue, clicked, flagged
 };
 
+short color_from_RGB(char r, char g, char b) {
 // Takes 3 numbers between 0 and 5 (inclusive) and returns the number a number
 // that can be inputed into init_pair.
 // R is for Red
 // G is for Green
 // B is for Blue
 // There are in total 6*6*6 different possible colors
-short color_from_RGB(char r, char g, char b) {
+
     return (r*36 + g*6 + b*1) + 16;
 }
 
@@ -60,15 +62,17 @@ void gcolors(){
   short black = grey_from_24(0);
   init_pair(my_black,     black,                 black                );
   init_pair(my_white,     grey_from_24(23),      black                );
-  init_pair(my_white_bg , black,                 grey_from_24(21)     );
+  init_pair(gblack,     COLOR_WHITE,            COLOR_WHITE          );
+  init_pair(my_white_bg,  black,                 grey_from_24(21)     );
   init_pair(my_green,     color_from_RGB(2,3,1), black                );
   init_pair(my_green_bg , black,                 color_from_RGB(2,3,1));
   init_pair(my_yellow_bg, black,                 color_from_RGB(5,4,1));
   init_pair(my_blue_bg,   black,                 color_from_RGB(1,1,5));
-  init_pair(my_red_bg,   COLOR_BLUE,                 color_from_RGB(5,1,0));
-  init_pair(original, COLOR_WHITE, COLOR_BLACK);
-  init_pair(my_blue, COLOR_BLUE, COLOR_WHITE);
-  init_pair(clicked, COLOR_BLUE, grey_from_24(12));
+  init_pair(my_red_bg,    black,                 color_from_RGB(4.5,0,0));
+  init_pair(original,     COLOR_WHITE,           COLOR_BLACK);
+  init_pair(my_blue,      COLOR_BLUE,            COLOR_WHITE);
+  init_pair(clicked,      COLOR_BLUE,            grey_from_24(15));
+  init_pair(flagged,      COLOR_RED,             grey_from_24(15));
 
 }
 void square (int y1, int x1, int y2, int x2){
@@ -95,50 +99,140 @@ void square (int y1, int x1, int y2, int x2){
     mvaddch(y2-1, x2, ACS_DS_LRCORNER);
 }
 
-//void print_cells(){
-    //el ancho es 34*24
-    //crea las celdas
-//   for(int j=5; j<29; j++){
-//           for(int i=6;  i<74; i+=2){
-
-//                mvaddch(j, i, '.');
-
-//            }
-//    }
-//}
-
 void print_cursor(point p){
         mvaddch(p.y, p.x, ACS_BLOCK);
         mvaddch(p.y, p.x+1, ACS_BLOCK);
 }
 
+void smiley(){
+//estos son los ojos
+        color_set(my_blue, nullptr);
+        mvaddch(10, 24, ACS_BLOCK);
+        mvaddch(10, 25, ACS_BLOCK);
+        mvaddch(11, 24, ACS_BLOCK);
+        mvaddch(11, 25, ACS_BLOCK);
+        mvaddch(10, 23, ACS_BLOCK);
+        mvaddch(11, 23, ACS_BLOCK);
+
+        mvaddch(10, 54, ACS_BLOCK);
+        mvaddch(10, 55, ACS_BLOCK);
+        mvaddch(11, 54, ACS_BLOCK);
+        mvaddch(11, 55, ACS_BLOCK);
+        mvaddch(11, 56, ACS_BLOCK);
+        mvaddch(10, 56, ACS_BLOCK);
+
+//la boca, supongo
+        for(int b=20; b<=25; b++){
+            mvaddch(20, b, ACS_BLOCK);
+        }
+
+        for(int c=54; c<=59; c++){
+            mvaddch(20, c, ACS_BLOCK);
+        }
+        for(int d=25; d<=31; d++){
+            mvaddch(21, d, ACS_BLOCK);
+        }
+        for(int e=48; e<=54; e++){
+            mvaddch(21, e, ACS_BLOCK);
+        }
+        for(int e=31; e<=48; e++){
+            mvaddch(22, e, ACS_BLOCK);
+        }
+}
+
+void draw_mine(){
+    color_set(my_black, NULL);
+
+    for(int i=9; i<=10; i++){
+     mvaddch(i, 38, ACS_BLOCK);
+     mvaddch(i, 39, ACS_BLOCK);
+    }
+    for(int i=20; i<=21; i++){
+     mvaddch(i, 38, ACS_BLOCK);
+     mvaddch(i, 39, ACS_BLOCK);
+    }
+    for(int i=26; i<=29; i++){
+     mvaddch(15, i, ACS_BLOCK);
+    }
+    for(int i=48; i<=51; i++){
+     mvaddch(15, i, ACS_BLOCK);
+    }
+    for(int i =0; i<9; i++){
+        for(int j=0; j<17; j++){
+            mvaddch(11+i, 30+j, ACS_BLOCK);
+            mvaddch(11+i, 31+j, ACS_BLOCK);
+        }
+    }
+    color_set(gblack, nullptr);
+
+    mvaddch(12, 30, ACS_BLOCK);
+    mvaddch(12, 31, ACS_BLOCK);
+    mvaddch(11, 32, ACS_BLOCK);
+    mvaddch(11, 33, ACS_BLOCK);
+
+    mvaddch(18, 30, ACS_BLOCK);
+    mvaddch(18, 31, ACS_BLOCK);
+    mvaddch(19, 32, ACS_BLOCK);
+    mvaddch(19, 33, ACS_BLOCK);
+
+    mvaddch(11, 44, ACS_BLOCK);
+    mvaddch(11, 45, ACS_BLOCK);
+    mvaddch(12, 46, ACS_BLOCK);
+    mvaddch(12, 47, ACS_BLOCK);
+
+    mvaddch(18, 46, ACS_BLOCK);
+    mvaddch(18, 47, ACS_BLOCK);
+    mvaddch(19, 44, ACS_BLOCK);
+    mvaddch(19, 45, ACS_BLOCK);
+    color_set(my_white, nullptr);
+    mvaddch(13,34, ACS_BLOCK);
+    mvaddch(14,34, ACS_BLOCK);
+    mvaddch(13,35, ACS_BLOCK);
+    mvaddch(14,35, ACS_BLOCK);
+    mvaddch(13,36, ACS_BLOCK);
+    mvaddch(14,36, ACS_BLOCK);
+    mvaddch(13,37, ACS_BLOCK);
+    mvaddch(14,37, ACS_BLOCK);
+
+
+    color_set(my_blue, nullptr);
+}
 void game(){
-    //ACS_LANTERN PARA LAS MINAS
+
+    randutils::mt19937_rng rng;
+
     clear();
 
     cell gscreen[34][24];
 
-        //color_set(4, NULL);
+    int rndx;
+    int rndy;
 
+    for(int i=0; i<24; i++){
 
+        for(int j=0; j<34.5; j++){
+            gscreen[j][i].click=0;
+            gscreen[j][i].flag=0;
+            gscreen[j][i].mine=0;
 
-for(int i=0; i<24; i++){
-    for(int j=0; j<34; j++){
-        gscreen[j][i].click=0;
-        gscreen[j][i].flag=0;
-
-        if(gscreen[j][i].click==0){
-            mvaddch(i+5, (j+3)*2, '.');
-        }
-        else if(gscreen[j][i].click==1){
-            mvaddch(i+5, (j+3)*2, '#');
+            if(gscreen[j][i].click==0){
+                mvaddch(i+5, (j+3)*2, '.');
+            }
+            else if(gscreen[j][i].click==1){
+                mvaddch(i+5, (j+3)*2, '#');
+            }
         }
     }
-}
+        //crea minas aleatorias
+        for(int k=0; k<150; k++){
+            rndx = rng.uniform(0, 33);
+            rndy = rng.uniform(0, 23);
+            gscreen[rndx][rndy].mine=1;
+            }
+
+//primer frame
 
     color_set(my_blue, NULL);
-
-
     square(4,5,30,74);
 
     //el ancho es 34*24
@@ -146,29 +240,27 @@ for(int i=0; i<24; i++){
         player.y =  5;
         player.x = 6;
 
-//    print_cells();
-
    print_cursor(player);
+
+//segundo frame en adelante
 
     bool quit = false;
     while( !quit ) {
     int f = getch();
-
-    point oldpos;
-        oldpos.y=player.y;
-        oldpos.x=player.x;
-
+    int sum = 0;
     switch(f) {
       case KEY_LEFT:        player.x-=2;    break;
-      case KEY_RIGHT:     player.x+=2;   break;
-      case KEY_UP:           player.y--;       break;
-      case KEY_DOWN:    player.y++;     break;
-      case 10: gscreen[(player.x-3)/2][player.y-5].click=true; break;
-      case '-': gscreen[(player.x-3)/2][player.y-5].flag=true; break;
-
+      case KEY_RIGHT:       player.x+=2;    break;
+      case KEY_UP:          player.y--;     break;
+      case KEY_DOWN:        player.y++;     break;
+      case 'm':  gscreen[(player.x-3)/2][player.y-5].flag=true;  break;
+      case 'n':  gscreen[(player.x-3)/2][player.y-5].flag=false; break;
+      case 10:   gscreen[(player.x-3)/2][player.y-5].click=true; break;
+                //gscreen[(player.x-3)/2][player.y-5].mine=false;
 
       case 'q': quit = true; break;
     }
+
 
     //napms(50);
     if(player.x<=4){
@@ -188,75 +280,95 @@ for(int i=0; i<24; i++){
     color_set(my_blue, NULL);
     square(4,5,30,74);
 
-//   print_cells();
 //EL LIENZO MIDE 68(34)*24
 
-for(int i=0; i<24; i++){
-    for(int j=0; j<34; j++){
+for(int i=0; i<25; i++){
+    for(int j=0; j<=33; j++){
 
+
+        /*
+            PARA ARREGLAR LO DE LOS BORDES, LLENAR LOS BORDES DE CEROS
+
+        */
+
+        gscreen[j][i].nearby= 48;
+        square(4,5,30,74);
+        sum=48;
         if(gscreen[j][i].click==0){
             mvaddch(i+5, (j+3)*2, '.');
         }
         else if(gscreen[j][i].click==1){
 
-            if(gscreen[j][i].flag==1){
-                gscreen[j][i].click==0;
+           if(gscreen[j][i].flag==1 && gscreen[j][i].click==1){
+                gscreen[j][i].flag=0;
             }
-            color_set(clicked, nullptr);
-            mvaddch(i+5, (j+2)*2, '#');
-            mvaddch(i+5, (j+2.5)*2, ' ');
-            color_set(my_blue, nullptr);
-            mvaddch(i+5, (j+3)*2, '.');
-        }
-        if(gscreen[j][i].flag==1){
-            color_set(my_green, NULL);
-             mvaddch(i+5, (j+2)*2, '|');
-             mvaddch(i+5, (j+2.5)*2, '>');
-             color_set(my_blue, nullptr);
-        }
-    }
-}
-    print_cursor(player);
-}
-}
+            else if(gscreen[j][i].mine==1){
+                    color_set(my_red_bg, nullptr);
+                    mvaddch(i+5, (j+2)*2, ACS_LANTERN);
+                    mvaddch(i+5, (j+2.5)*2, ' ');
+                    color_set(my_blue, nullptr);
+                    mvaddch(i+5, (j+3)*2, '.');
+                    gscreen[j][i].flag=0;
+                    color_set(my_blue, nullptr);
 
+
+                    }
+
+                    else {
+
+                              if(gscreen[j+1][i].mine==1){
+                                 gscreen[j][i].nearby++;
+                            } if(gscreen[j-1][i].mine==1){
+                                 gscreen[j][i].nearby++;
+                            } if(gscreen[j][i+1].mine==1){
+                                 gscreen[j][i].nearby++;
+                            } if(gscreen[j][i-1].mine==1){
+                                 gscreen[j][i].nearby++;
+                            } if(gscreen[j+1][i+1].mine==1){
+                                 gscreen[j][i].nearby++;
+                            } if(gscreen[j-1][i-1].mine==1){
+                                 gscreen[j][i].nearby++;
+                            } if(gscreen[j+1][i-1].mine==1){
+                                 gscreen[j][i].nearby++;
+                            } if(gscreen[j-1][i+1].mine==1){
+                                 gscreen[j][i].nearby++;
+                            }
+                            color_set(clicked, nullptr);
+                            if(gscreen[j][i].nearby==48){
+                               mvaddch(i+5, (j+2)*2, ' ');
+                               mvaddch(i+5, (j+2.5)*2, ' ');
+                            }
+                            else{
+                               mvaddch(i+5, (j+2)*2, gscreen[j][i].nearby );
+                               mvaddch(i+5, (j+2.5)*2, ' ');
+                            }
+                            color_set(my_blue, NULL);
+                            mvaddch(i+5, (j+3)*2, '.');
+
+                    }
+
+        }
+
+        if(gscreen[j][i].flag==1){
+            color_set(flagged, NULL);
+             mvaddch(i+5, (j+2)*2, ' ');
+             mvaddch(i+5, (j+2.5)*2,'P');
+             color_set(my_blue, nullptr);
+
+        }
+     }
+    print_cursor(player);
+   }
+  }
+ }
 void intro(){
     square(4,5,30,74);
     //los pairs van en (# DEL PAR, COLOR DE TEXTO, COLOR DE FONDO)
     bkgd(COLOR_PAIR(my_blue));
-    //estos son los ojos
-    color_set(my_blue, nullptr);
-    mvaddch(10, 24, ACS_BLOCK);
-    mvaddch(10, 25, ACS_BLOCK);
-    mvaddch(11, 24, ACS_BLOCK);
-    mvaddch(11, 25, ACS_BLOCK);
-    mvaddch(10, 23, ACS_BLOCK);
-    mvaddch(11, 23, ACS_BLOCK);
 
-    mvaddch(10, 54, ACS_BLOCK);
-    mvaddch(10, 55, ACS_BLOCK);
-    mvaddch(11, 54, ACS_BLOCK);
-    mvaddch(11, 55, ACS_BLOCK);
-    mvaddch(11, 56, ACS_BLOCK);
-    mvaddch(10, 56, ACS_BLOCK);
+    //smiley();
+    draw_mine();
 
-    //la boca, supongo
-    for(int b=20; b<=25; b++){
-        mvaddch(20, b, ACS_BLOCK);
-    }
-
-    for(int c=54; c<=59; c++){
-        mvaddch(20, c, ACS_BLOCK);
-    }
-    for(int d=25; d<=31; d++){
-        mvaddch(21, d, ACS_BLOCK);
-    }
-    for(int e=48; e<=54; e++){
-        mvaddch(21, e, ACS_BLOCK);
-    }
-    for(int e=31; e<=48; e++){
-        mvaddch(22, e, ACS_BLOCK);
-    }
     mvaddch(26, 18 , '*');
     addstr("Presiona la barra espaciadora para empezar*");
 
@@ -279,7 +391,7 @@ int main()
 
   // Configurations for PDCurses in windows (this doesn't affect regular ncurses in linux)
   ttytype[0] = 35;  ttytype[1] = 45; // 35 to 45 lines height
-  ttytype[2] = 80;  ttytype[3] = (unsigned char)130; // 80 to 130 characters width
+  ttytype[2] = 80;  ttytype[3] = (unsigned char)70; // 80 to 130 characters width
 
   // Initializing window to print in
   initscr();   // starting screen
@@ -295,6 +407,8 @@ int main()
   //para agregar caracteres en pantalla se insertan de la forma (y,x)
 
   // ______________Acá comienza mi código en main_____________________
+
+
 
     intro();
 
