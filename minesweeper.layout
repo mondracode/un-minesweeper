@@ -2,23 +2,17 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Release" />
-	<File name="main.cpp" open="1" top="1" tabpos="1" split="2" active="1" splitpos="1486" zoom_1="-1" zoom_2="1">
+	<File name="main.cpp" open="1" top="1" tabpos="1" split="2" active="1" splitpos="962" zoom_1="-2" zoom_2="-4">
 		<Cursor>
-			<Cursor1 position="7438" topLine="104" />
-			<Cursor2 position="607" topLine="51" />
+			<Cursor1 position="4258" topLine="67" />
+			<Cursor2 position="13478" topLine="412" />
 		</Cursor>
 		<Folding>
 			<Collapse line="12" />
 			<Collapse line="21" />
-			<Collapse line="25" />
-			<Collapse line="33" />
-			<Collapse line="42" />
-			<Collapse line="53" />
-			<Collapse line="57" />
 			<Collapse line="77" />
 			<Collapse line="101" />
 			<Collapse line="106" />
-			<Collapse line="142" />
 		</Folding>
 	</File>
 </CodeBlocks_layout_file>

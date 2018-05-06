@@ -62,7 +62,7 @@ void gcolors(){
   short black = grey_from_24(0);
   init_pair(my_black,     black,                 black                );
   init_pair(my_white,     grey_from_24(23),      black                );
-  init_pair(gblack,     COLOR_WHITE,            COLOR_WHITE          );
+  init_pair(gblack,       COLOR_WHITE,           COLOR_WHITE          );
   init_pair(my_white_bg,  black,                 grey_from_24(21)     );
   init_pair(my_green,     color_from_RGB(2,3,1), black                );
   init_pair(my_green_bg , black,                 color_from_RGB(2,3,1));
@@ -140,6 +140,26 @@ void smiley(){
         }
 }
 
+void print_help_text(){
+        move(32, 5);
+        addstr("Presiona 'enter' para abrir cada celda");
+        move(34, 5);
+        addstr("Los números en las celdas abiertas indican el número de minas cercanas");
+        move(36, 5);
+        addstr("Si crees haber encontrado una mina, la puedes marcar con 'm'");
+        move(37, 5);
+        addstr("Y puedes desmarcarla con 'n'");
+
+
+        for(int i=5; i<75; i++){
+            mvaddch(39, i, ACS_HLINE);
+        }
+        move(40, 5);
+        addstr("Hecho con (mucha) paciencia por Santiago Mondragón y Juan Camilo Amaya");
+        move(42, 5);
+        addstr("(C) 2018");
+}
+
 void draw_mine(){
     color_set(my_black, NULL);
 
@@ -214,8 +234,7 @@ void game(){
             gscreen[j][i].click=0;
             gscreen[j][i].flag=0;
             gscreen[j][i].mine=0;
-
-            if(gscreen[j][i].click==0){
+             if(gscreen[j][i].click==0){
                 mvaddch(i+5, (j+3)*2, '.');
             }
             else if(gscreen[j][i].click==1){
@@ -225,15 +244,20 @@ void game(){
     }
         //crea minas aleatorias
         for(int k=0; k<150; k++){
-            rndx = rng.uniform(0, 33);
-            rndy = rng.uniform(0, 23);
+            rndx = rng.uniform(1, 33);
+            rndy = rng.uniform(1, 22);
             gscreen[rndx][rndy].mine=1;
+
             }
+
+
 
 //primer frame
 
     color_set(my_blue, NULL);
-    square(4,5,30,74);
+    square(4,5,29,72);
+
+    print_help_text();
 
     //el ancho es 34*24
     point player;
@@ -247,75 +271,81 @@ void game(){
     bool quit = false;
     while( !quit ) {
     int f = getch();
-    int sum = 0;
-    switch(f) {
+     switch(f) {
       case KEY_LEFT:        player.x-=2;    break;
       case KEY_RIGHT:       player.x+=2;    break;
       case KEY_UP:          player.y--;     break;
       case KEY_DOWN:        player.y++;     break;
       case 'm':  gscreen[(player.x-3)/2][player.y-5].flag=true;  break;
       case 'n':  gscreen[(player.x-3)/2][player.y-5].flag=false; break;
-      case 10:   gscreen[(player.x-3)/2][player.y-5].click=true; break;
+      case 10:   gscreen[(player.x-3)/2][player.y-5].click=true;  break;
                 //gscreen[(player.x-3)/2][player.y-5].mine=false;
 
-      case 'q': quit = true; break;
+      case 'q': quit = true;  break;
     }
 
 
     //napms(50);
     if(player.x<=4){
-        player.x=72;
+        player.x=70;
     }
-    else if(player.x>=73){
+    else if(player.x>=71){
         player.x=6;
     }
-    else if(player.y>=29){
+    else if(player.y>=28){
         player.y=5;
     }
     else if(player.y<=4){
-        player.y=28;
+        player.y=27 ;
     }
 
     clear();
     color_set(my_blue, NULL);
-    square(4,5,30,74);
+    square(4,5,29,72);
+    print_help_text();
 
 //EL LIENZO MIDE 68(34)*24
 
 for(int i=0; i<25; i++){
     for(int j=0; j<=33; j++){
 
-
-        /*
-            PARA ARREGLAR LO DE LOS BORDES, LLENAR LOS BORDES DE CEROS
-
-        */
-
         gscreen[j][i].nearby= 48;
-        square(4,5,30,74);
-        sum=48;
+        square(4,5,29,72);
         if(gscreen[j][i].click==0){
             mvaddch(i+5, (j+3)*2, '.');
         }
         else if(gscreen[j][i].click==1){
 
            if(gscreen[j][i].flag==1 && gscreen[j][i].click==1){
-                gscreen[j][i].flag=0;
+                gscreen[j][i].click=0;
+                gscreen[j][i].flag=1;
             }
+
             else if(gscreen[j][i].mine==1){
                     color_set(my_red_bg, nullptr);
                     mvaddch(i+5, (j+2)*2, ACS_LANTERN);
                     mvaddch(i+5, (j+2.5)*2, ' ');
+
+                    for(int i=0; i<24; i++){
+
+                        for(int j=0; j<34.5; j++){
+                            gscreen[j][i].click=1;
+
+                        }
+                    }
+                    nodelay(stdscr, false);
+
+
                     color_set(my_blue, nullptr);
                     mvaddch(i+5, (j+3)*2, '.');
                     gscreen[j][i].flag=0;
-                    color_set(my_blue, nullptr);
 
+                    color_set(my_blue, nullptr);
 
                     }
 
                     else {
-
+                            //calcula las minas circundantes
                               if(gscreen[j+1][i].mine==1){
                                  gscreen[j][i].nearby++;
                             } if(gscreen[j-1][i].mine==1){
@@ -332,18 +362,34 @@ for(int i=0; i<25; i++){
                                  gscreen[j][i].nearby++;
                             } if(gscreen[j-1][i+1].mine==1){
                                  gscreen[j][i].nearby++;
+                            } if(j==1 && i==0){
+                                gscreen[j][i].nearby--;
                             }
                             color_set(clicked, nullptr);
                             if(gscreen[j][i].nearby==48){
                                mvaddch(i+5, (j+2)*2, ' ');
                                mvaddch(i+5, (j+2.5)*2, ' ');
-                            }
+
+                               gscreen[j][i+1].click=1;
+                               gscreen[j][i-1].click=1;
+                               gscreen[j+1][i+1].click=1;
+                               gscreen[j+1][i-1].click=1;
+                               gscreen[j-1][i+1].click=1;
+                               gscreen[j-1][i-1].click=1;
+                               gscreen[j+1][i].click=1;
+                               gscreen[j-1][i].click=1;
+
+
+                           }
                             else{
-                               mvaddch(i+5, (j+2)*2, gscreen[j][i].nearby );
-                               mvaddch(i+5, (j+2.5)*2, ' ');
+                                    mvaddch(i+5, (j+2)*2, gscreen[j][i].nearby );
+                                    mvaddch(i+5, (j+2.5)*2, ' ');
+
                             }
                             color_set(my_blue, NULL);
                             mvaddch(i+5, (j+3)*2, '.');
+
+
 
                     }
 
@@ -351,18 +397,31 @@ for(int i=0; i<25; i++){
 
         if(gscreen[j][i].flag==1){
             color_set(flagged, NULL);
-             mvaddch(i+5, (j+2)*2, ' ');
-             mvaddch(i+5, (j+2.5)*2,'P');
+             mvaddch(i+5, (j+2)*2, '|');
+             mvaddch(i+5, (j+2.5)*2,'>');
              color_set(my_blue, nullptr);
 
         }
+
      }
     print_cursor(player);
-   }
-  }
+
+    color_set(gblack, nullptr);
+    for(int i=0; i<73; i++){
+            mvaddch(29, i, 'f');
+    }
+    for(int i=3; i<31; i++){
+            mvaddch(i, 4, 'f');
+    }
+    color_set(my_blue,nullptr);
+
+    }
+
+
+     }
  }
 void intro(){
-    square(4,5,30,74);
+    square(4,5,29,72);
     //los pairs van en (# DEL PAR, COLOR DE TEXTO, COLOR DE FONDO)
     bkgd(COLOR_PAIR(my_blue));
 
@@ -391,18 +450,18 @@ int main()
 
   // Configurations for PDCurses in windows (this doesn't affect regular ncurses in linux)
   ttytype[0] = 35;  ttytype[1] = 45; // 35 to 45 lines height
-  ttytype[2] = 80;  ttytype[3] = (unsigned char)70; // 80 to 130 characters width
+  ttytype[2] = 80;  ttytype[3] = (unsigned char)70; // 70 characters width
 
   // Initializing window to print in
   initscr();   // starting screen
   cbreak();
-  noecho();                                                            // consume characters without showing them in screen
-  curs_set(0);                                                         // setting cursor as invisible
+  noecho();                                                     // consume characters without showing them in screen
+  curs_set(0);                                                  // setting cursor as invisible
   keypad(stdscr, true);                                         // allowing ncurses to convert press keys into curses representation (useful for KEY_UP)
-  start_color();                                                      // asking ncurses to use colors
-  clear();                                                               // cleaning screen
-  nodelay(stdscr, false);                                      // deactivating blocking getch
-  gcolors();                                                          // starting color pairs
+  start_color();                                                // asking ncurses to use colors
+  clear();                                                      // cleaning screen
+  nodelay(stdscr, true);                                        // deactivating blocking getch
+  gcolors();                                                    // starting color pairs
 
   //para agregar caracteres en pantalla se insertan de la forma (y,x)
 
